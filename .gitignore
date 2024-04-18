@@ -1,0 +1,10 @@
+.env
+.idea/
+.__pathlib__/
+
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+
+*.db
+*.env
