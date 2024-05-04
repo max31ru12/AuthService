@@ -12,8 +12,7 @@ from starlette.status import (
 from pydantic import BaseModel, Field
 
 from app.models.users_db import User
-from app.models.session_db import Session
-from app.utils.authorization import authorized_user, set_session_cookie, delete_session_cookie
+from app.utils.authorization import set_session_cookie, delete_session_cookie
 
 router = APIRouter(tags=["register"])
 
@@ -43,7 +42,6 @@ class SignIn(BaseModel):
     "/signin/",
 )
 async def sign_in(response: Response, auth_data: SignIn):
-
     user: User = await User.select_first_by_kwargs(username=auth_data.username)
     if user is None:
         raise HTTPException(
@@ -55,7 +53,6 @@ async def sign_in(response: Response, auth_data: SignIn):
             HTTP_403_FORBIDDEN,
             detail="Wrong password",
         )
-
     await set_session_cookie(response, user)
 
 
@@ -64,10 +61,4 @@ async def sign_out(request: Request, response: Response) -> None:
     await delete_session_cookie(request, response)
 
 
-@router.get(
-    "/profile/",
-    response_model=User.FullModel,
-)
-async def user_profile(user: authorized_user) -> User:
 
-    return user

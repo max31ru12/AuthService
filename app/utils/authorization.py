@@ -31,6 +31,11 @@ async def delete_session_cookie(request: Request, response: Response) -> None:
     session = await Session.select_first_by_kwargs(
         token=request.cookies[AUTH_COOKIE_NAME]
     )
+    if session is None:
+        raise HTTPException(
+            HTTP_401_UNAUTHORIZED,
+            detail="Already unauthorized"
+        )
     session.disable()
     response.delete_cookie(AUTH_COOKIE_NAME)
 
@@ -50,7 +55,7 @@ async def authorize_session(
             detail="Session is invalid"
         )
 
-    if session.session_expired:
+    if session.session_expired or not session.status:
         raise HTTPException(
             HTTP_401_UNAUTHORIZED,
             detail="Session expired"
@@ -72,6 +77,3 @@ async def authorize_user(
 
 authorized_session = Annotated[Session, Depends(authorize_session)]
 authorized_user = Annotated[User, Depends(authorize_user)]
-
-
-

@@ -15,16 +15,14 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(String(100))
-    email: Mapped[str] = mapped_column(String(100))
+    username: Mapped[str] = mapped_column(String(100), unique=True)
+    email: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str] = mapped_column(String(100))
     registered_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
-
-    def is_password_valid(self, password: str) -> bool:
-        return pbkdf2_sha256.verify(password, self.password)
+    last_password_change: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     @staticmethod
-    def generate_hash(password):
+    def generate_hash(password: str):
         return pbkdf2_sha256.hash(password)
 
     PasswordType = Annotated[
@@ -39,3 +37,12 @@ class User(Base):
         columns=[id, username, registered_at]
     )
 
+    def is_password_valid(self, password: str) -> bool:
+        return pbkdf2_sha256.verify(password, self.password)
+
+    def change_password(self, new_password: str) -> None:
+        self.last_password_change = datetime.utcnow()  # noqa
+        self.password = self.generate_hash(new_password)  # noqa
+
+    def change_email(self, new_email) -> None:
+        self.email = new_email  # noqa

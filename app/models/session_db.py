@@ -43,5 +43,5 @@ class Session(Base):
 
     @property
     def session_expired(self) -> bool:
-        return self.created_at > datetime.utcnow() - self.lifetime
+        return datetime.utcnow() > self.created_at + self.lifetime
 
