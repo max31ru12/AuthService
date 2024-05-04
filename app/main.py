@@ -29,8 +29,7 @@ app.include_router(profile.router, prefix="/api/v1/profile")
 
 @app.middleware("http")
 async def session_middleware(
-        request: Request,
-        call_next: Callable[[Request], Awaitable[Response]]
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     async with sessionmaker.begin() as session:
         session_context.set(session)
