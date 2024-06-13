@@ -1,12 +1,10 @@
-from dotenv import load_dotenv
-from pathlib import Path
 from os import getenv
+from pathlib import Path
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncEngine
-from sqlalchemy.orm import DeclarativeBase
+from dotenv import load_dotenv
 from sqlalchemy import MetaData
-
-from app.common.services import MappingBase
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
 WORKDIR: Path = Path.cwd()
 
@@ -27,9 +25,11 @@ sessionmaker = async_sessionmaker(async_engine, expire_on_commit=False)
 db_meta = MetaData()
 
 
-class Base(DeclarativeBase, MappingBase):
+class Base(DeclarativeBase):
     metadata = db_meta
 
     def __repr__(self):
-        cols = [f"{col} = {getattr(self, col)}" for col in self.__table__.columns.keys()]
+        cols = [
+            f"{col} = {getattr(self, col)}" for col in self.__table__.columns.keys()
+        ]
         return f"<{self.__class__.__name__} {', '.join(cols)}>"
