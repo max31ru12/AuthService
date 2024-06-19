@@ -1,43 +1,43 @@
-from contextlib import asynccontextmanager, AbstractAsyncContextManager
-
-import pytest
-from typing import Iterator, AsyncIterator, Protocol
-from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession
-
-
-from app.main import app
-from app.common.config import sessionmaker
-from app.common.services import session_context
-
-
-pytest_plugins = ("anyio", )
-
-
-@pytest.fixture(scope="session")
-def anyio_backend() -> str:
-    return "asyncio"
-
-
-@pytest.fixture(scope="session")
-def client() -> Iterator[TestClient]:
-    with TestClient(app) as client:
-        yield client
-
-
-class ActiveSession(Protocol):
-    def __call__(self) -> AbstractAsyncContextManager[AsyncSession]:
-        pass
-
-
-@pytest.fixture()
-def active_session() -> ActiveSession:
-    @asynccontextmanager
-    async def active_session_inner() -> AsyncIterator[AsyncSession]:
-        async with sessionmaker.begin() as session:
-            session_context.set(session)
-            yield session
-
-    return active_session_inner
-
-
+# import pytest
+# from typing import Iterator
+#
+# from fastapi import Depends
+# from fastapi.testclient import TestClient
+# from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+#
+# from app.main import app
+# from app.common.config import sessionmaker, db_meta, Base
+# from app.utils.unit_of_work import UnitOfWork
+#
+# pytest_plugins = ("anyio",)
+#
+#
+# TEST_DB_URL = "postgresql+asyncpg://test:test@localhost:5432/test"
+#
+# engine = create_async_engine(
+#     TEST_DB_URL,
+#     echo=True,
+# )
+#
+# TestingSessionLocal = async_sessionmaker(
+#     engine,
+# )
+#
+# # Base.metadata.create_all()
+#
+#
+# @pytest.fixture(scope="session")
+# def anyio_backend() -> str:
+#     return "asyncio"
+#
+#
+# @pytest.fixture(scope="session")
+# def client() -> Iterator[TestClient]:
+#     with TestClient(app, base_url="http://localhost/api/v1/") as client:
+#         yield client
+#
+#
+# @pytest.fixture(scope="session")
+# async def session() -> AsyncSession:
+#     yield sessionmaker()
+#

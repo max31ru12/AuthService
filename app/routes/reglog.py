@@ -1,32 +1,30 @@
-from typing import Annotated
-
 from fastapi import APIRouter
-from pydantic import BaseModel, Field
-from starlette.exceptions import HTTPException
-from starlette.status import HTTP_409_CONFLICT
+from pydantic import BaseModel
 
 from app.models.users_db import User
-from app.utils.dependencies import uow_dep
 
-router = APIRouter(tags=["register"])
+router = APIRouter(prefix="/users")
 
 
-@router.post(
-    "/register/",
-    response_model=User.FullModel,
-    status_code=201,
-)
-async def register(data: User.RegisterModel, uow: uow_dep):
-    async with uow:
-        user = await uow.users.select_first_by_kwargs(email=data.email)
-        if user is not None:
-            raise HTTPException(HTTP_409_CONFLICT, detail="Email already in use")
-        user = await uow.users.create(**data.model_dump())
-        print(user)
-        await uow.commit()
+class SignUp(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+@router.post("/", response_model=User.FullModel)
+async def sign_up(data: SignUp) -> User:
+    user = await User.create(**data.model_dump())
     return user
 
 
-class SignIn(BaseModel):
-    username: str
-    password: Annotated[str, Field(min_length=4, max_length=100)]
+# @router.get("/")
+# async def get_users():
+#     users = await UserRepository().select_all()
+#     return users
+#
+#
+# @router.get("/{user_id}")
+# async def get_user_by_id(user_id: int):
+#     user = await UserRepository().select_first_by_kwargs(id=user_id)
+#     return user

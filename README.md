@@ -1,7 +1,7 @@
 # AuthService
-Experiment with authentication 
+Experiment with authentication
 
-## How to run project
+## How to run the app
 
 Clone repository
 ```shell
@@ -13,6 +13,10 @@ Run docker-containers
 docker compose up --build -d
 ```
 
+Available on: `http://127.0.0.1:8000`
+
+## Developer Mode
+
 Install and run poetry
 ```shell
 # .../AuthService
@@ -20,6 +24,15 @@ poetry init
 
 # activate virtual env
 poetry shell
+
+# install dependencies
+poetry install
+```
+
+Up development containers
+
+```shell
+docker compose -f ./docker-compose-dev.yml up
 ```
 
 Run project with uvicorn
