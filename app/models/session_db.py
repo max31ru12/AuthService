@@ -25,6 +25,10 @@ class Session(Base):
 
     status: Mapped[bool] = mapped_column(default=True)
 
+    @property
+    def expired(self) -> bool:
+        return datetime.utcnow() > self.created_at + self.lifetime
+
     def disable(self) -> None:
         self.status = False  # noqa
 
@@ -40,8 +44,3 @@ class Session(Base):
     FullModel = MappedModel.create(
         columns=[token, user_id, created_at]
     )
-
-    @property
-    def session_expired(self) -> bool:
-        return datetime.utcnow() > self.created_at + self.lifetime
-

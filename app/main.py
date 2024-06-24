@@ -6,7 +6,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from app.common.config import DEV_MODE, sessionmaker
-from app.routes import reglog
+from app.routes import reglog, current_user
 from app.utils.repository import session_context
 from app.utils.setup import reinit_database
 
@@ -24,6 +24,7 @@ app = FastAPI(
 )
 
 app.include_router(reglog.router, prefix="/api/v1")
+app.include_router(current_user.router, prefix="/api/v1")
 
 
 @app.middleware("http")

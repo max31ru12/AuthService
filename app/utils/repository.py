@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from contextvars import ContextVar
 from typing import Any, Self
 
@@ -20,9 +21,20 @@ db = DBContorller()
 
 
 class BaseRepository:
+
     @classmethod
     async def create(cls, **kwargs: Any) -> Self:
         entry = cls(**kwargs)  # noqa
         db.session.add(entry)
         await db.session.flush()
         return entry
+
+    @classmethod
+    async def select_all(cls):
+        stmt = select(cls)
+        return (await db.session.execute(stmt)).scalars().all()
+
+    @classmethod
+    async def select_first_by_kwargs(cls, **kwargs: Any) -> Self | None:
+        stmt = select(cls).filter_by(**kwargs)
+        return (await db.session.execute(stmt)).scalars().first()

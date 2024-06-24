@@ -33,8 +33,12 @@ class User(Base):
         columns=[username, email, (password, PasswordType)]
     )
 
-    FullModel = MappedModel.create(
-        columns=[id, username, registered_at]
+    ProfileModel = MappedModel.create(
+        columns=[username, email, registered_at, last_password_change]
+    )
+
+    FullModel = ProfileModel.extend(
+        columns=[id]
     )
 
     def is_password_valid(self, password: str) -> bool:
